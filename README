@@ -11,17 +11,18 @@ This alllows:
   Logger::date(Logger::PRIORITY);
   Logger::date_priority(Logger::PRIORITY); //Default
 
-  log << "Some random info" << info << endl;
-  err << "Some error";
-  warn << "Some warning";
-  debug << "debug text";
+  log_log << "Some random info" << info << endl;
+  log_err << "Some error";
+  log_warn << "Some warning";
+  log_debug << "debug text";
 
-  logf("Format string %s", "string");
-  errf("%d %d %d", year, month, day);
-  warnf("THE WORLD WILL END IN %f SEC", sec);
-  debugf("debug text");
+  log_logf("Format string %s", "string");
+  log_errf("%d %d %d", year, month, day);
+  log_warnf("THE WORLD WILL END IN %f SEC", sec);
+  log_debugf("debug text");
 
 TODO: 
 Make threading safe.
-  Add mutex in singleton constructor.
-  Add lock on streams, for correct resolving of concurent << operators.
+  x Add mutex in singleton constructor. [Needs testing]
+  o Add lock on streams, for correct resolving of concurent << operators.
+  o Write (or copy) good variadic printf function to resolve logf calls. (Current has no formating abilites)
