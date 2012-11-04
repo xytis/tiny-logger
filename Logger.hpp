@@ -11,17 +11,17 @@
 #include <pthread.h>
 #endif
 
-#define log Log::Logger::Instance()->get_stream_with_header(Log::INFO)
-#define err Log::Logger::Instance()->get_stream_with_header(Log::ERROR)
-#define warn Log::Logger::Instance()->get_stream_with_header(Log::WARNING)
-#define debug Log::Logger::Instance()->get_stream_with_header(Log::DEBUG) << '[' << __FILE__ << ':' << __LINE__ << "] "
+#define log_log Log::Logger::Instance()->get_stream_with_header(Log::INFO)
+#define log_err Log::Logger::Instance()->get_stream_with_header(Log::ERROR)
+#define log_warn Log::Logger::Instance()->get_stream_with_header(Log::WARNING)
+#define log_debug Log::Logger::Instance()->get_stream_with_header(Log::DEBUG) << '[' << __FILE__ << ':' << __LINE__ << "] "
 
 //Explanation of ## is here: http://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
 
-#define logf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::INFO), format , ##__VA_ARGS__)
-#define errf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::ERROR), format , ##__VA_ARGS__)
-#define warnf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::WARNING), format , ##__VA_ARGS__)
-#define debugf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::DEBUG), (std::string("[%s:%d] ")+ std::string(format)).c_str(), __FILE__, __LINE__ , ##__VA_ARGS__)
+#define log_logf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::INFO), format , ##__VA_ARGS__)
+#define log_errf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::ERROR), format , ##__VA_ARGS__)
+#define log_warnf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::WARNING), format , ##__VA_ARGS__)
+#define log_debugf(format, ...) Log::Logger::Instance()->formated_output(Log::Logger::Instance()->get_stream_with_header(Log::DEBUG), (std::string("[%s:%d] ")+ std::string(format)).c_str(), __FILE__, __LINE__ , ##__VA_ARGS__)
 
 
 
@@ -247,9 +247,11 @@ public:
     };
 
 private:
+#ifdef THREAD
     //Threading safe constructor and destructor uses a mutex
     static pthread_mutex_t mutex;
-
+#endif
+    
     std::ostream * log_stream;
     std::ostream * err_stream;
     std::ostream * warn_stream;
@@ -265,11 +267,12 @@ private:
      * Sets all channels to std::cout,
      * default header: date_priority
      */
-    Logger():log_stream(&std::cout),
-    err_stream(&std::cout),
-    warn_stream(&std::cout),
-    debug_stream(&std::cout),
-    header(date_priority)
+    Logger()
+    : log_stream(&std::cout)
+    , err_stream(&std::cout)
+    , warn_stream(&std::cout)
+    , debug_stream(&std::cout)
+    , header(date_priority)
     {
 
     };
@@ -297,10 +300,13 @@ private:
  */
 Logger* Logger::m_instance = NULL;
 
+#ifdef THREAD
 /**
  * Mutex unlock
  */
 pthread_mutex_t Logger::mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+  
 }
 
 #endif
